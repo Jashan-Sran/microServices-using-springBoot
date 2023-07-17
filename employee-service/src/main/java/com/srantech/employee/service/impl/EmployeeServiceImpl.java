@@ -1,6 +1,7 @@
 package com.srantech.employee.service.impl;
 
 import com.srantech.employee.entity.Employee;
+import com.srantech.employee.feignClient.AddressClient;
 import com.srantech.employee.repository.EmployeeRepo;
 import com.srantech.employee.response.AddressResponse;
 import com.srantech.employee.response.EmployeeResponse;
@@ -20,8 +21,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private ModelMapper modelMapper;
 
     @Autowired
-    private RestTemplate restTemplate;
-
+    private AddressClient addressClient;
 
     @Override
     public EmployeeResponse getEmployeeDetails(int id) {
@@ -29,7 +29,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeRepo.findById(id).get();
         EmployeeResponse employeeResponse = modelMapper.map(employee, EmployeeResponse.class);
 
-        AddressResponse addressResponse = restTemplate.getForObject("http://localhost:8080/address-app/api/address/{id}",AddressResponse.class,id);
+        AddressResponse addressResponse = addressClient.getAddressByPassingEmployeeId(id);
         employeeResponse.setAddressResponse(addressResponse);
 
         return employeeResponse;
